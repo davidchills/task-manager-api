@@ -28,7 +28,7 @@ router.get('/tasks', auth, async (req, res) => {
 	// const sort = {}
 	
 	// The very basics of the needed options for populate
-	const populateOptions = { path: 'tasks' }
+	const populateOptions = { path: 'tasks', options: { sort: { createdAt: 1 } } }
 
 	// Only add match criteria if suuplied
 	if (req.query.completed) {
@@ -39,15 +39,15 @@ router.get('/tasks', auth, async (req, res) => {
 	// Only add the sort data if it is supplied
 	if (req.query.sortBy) {
 		const parts = req.query.sortBy.split('_')
-		populateOptions.sort = {}
-		populateOptions.sort[parts[0]] = (parts[1] === 'desc') ? -1 : 1
+		populateOptions.options.sort = {}
+		populateOptions.options.sort[parts[0]] = (parts[1] === 'desc') ? -1 : 1
 	}
 
 	// Only add the limit if a value is supplied
-	if (req.query.limit) { populateOptions.limit = parseInt(req.query.limit, 10) }
+	if (req.query.limit) { populateOptions.options.limit = parseInt(req.query.limit, 10) }
 
 	// Only add the skip if a value is provided
-	if (req.query.skip) { populateOptions.skip = parseInt(req.query.skip, 10) }
+	if (req.query.skip) { populateOptions.options.skip = parseInt(req.query.skip, 10) }
 	// console.log(populateOptions)
 
 	try {
