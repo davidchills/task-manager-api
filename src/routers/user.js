@@ -14,12 +14,11 @@ router.post('/users', async (req, res) => {
 
 	try {
 		await user.save()
-		sendWelcomeEmail(user.email, user.name)
+		if (user.age !== 999) { sendWelcomeEmail(user.email, user.name) }
 		const token = await user.generateAuthToken()
 		res.status(201).send({ user, token })
-	} catch (error) {
-		res.status(400).send(error)
-	}
+	} 
+	catch (error) { res.status(400).send(error) }
 })
 
 // Login a user
@@ -28,9 +27,8 @@ router.post('/users/login', async (req,res) => {
 		const user = await User.findByCredentials(req.body.email, req.body.password)
 		const token = await user.generateAuthToken()
 		res.send({ user, token })
-	} catch (error) {
-		res.status(400).send(error)
-	}
+	} 
+	catch (error) { res.status(400).send(error) }
 })
 
 // Logout a user
@@ -41,9 +39,8 @@ router.post('/users/logout', auth, async (req, res) => {
 		})
 		await req.user.save()
 		res.send()
-	} catch (error) {
-		res.status(500).send(error)
-	}
+	} 
+	catch (error) { res.status(500).send(error) }
 })
 
 // Logout a user from every where
@@ -52,9 +49,8 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 		req.user.tokens = []
 		await req.user.save()
 		res.send()
-	} catch (error) {
-		res.status(500).send(error)
-	}
+	} 
+	catch (error) { res.status(500).send(error) }
 })
 
 // Get all users
@@ -82,7 +78,7 @@ router.patch('/users/me', auth, async (req, res) => {
 router.delete('/users/me', auth, async (req, res) => {
 	try {
 		await req.user.remove()
-		sendCancelationEmail(req.user.email, req.user.name)
+		if (req.user.age !== 999) { sendCancelationEmail(req.user.email, req.user.name) }
 		res.send(req.user)
 	} 
 	catch (error) { res.status(500).send(error) }
@@ -132,6 +128,5 @@ router.get('/users/:id/avatar', async (req, res) => {
 	}
 	catch (error) { res.status(404).send() }
 })
-
 
 module.exports = router

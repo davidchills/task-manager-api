@@ -11,7 +11,6 @@ router.post('/tasks', auth, async (req, res) => {
 		...req.body, 
 		owner: req.user._id
 	})
-
 	try {
 		await task.save()
 		res.status(201).send(task)
@@ -24,13 +23,10 @@ router.post('/tasks', auth, async (req, res) => {
 // /tasks?limit=10&skip=0
 // /tasks?sortBy=createdAt_asc
 router.get('/tasks', auth, async (req, res) => {
-	// const match = {}
-	// const sort = {}
-	
 	// The very basics of the needed options for populate
 	const populateOptions = { path: 'tasks', options: { sort: { createdAt: 1 } } }
 
-	// Only add match criteria if suuplied
+	// Only add match criteria if supplied
 	if (req.query.completed) {
 		populateOptions.match = {}
 		populateOptions.match.completed = (req.query.completed === 'true')
@@ -48,22 +44,8 @@ router.get('/tasks', auth, async (req, res) => {
 
 	// Only add the skip if a value is provided
 	if (req.query.skip) { populateOptions.options.skip = parseInt(req.query.skip, 10) }
-	// console.log(populateOptions)
 
 	try {
-		// A different way to get tasks for the authenticated user
-		// const tasks = await Task.find({ owner: req.user._id })
-		// res.send(tasks)
-		
-		// await req.user.populate([{
-		// 	path: 'tasks',
-		// 	match: match,
-		// 	options: {
-		// 		limit: parseInt(req.query.limit, 10),
-		// 		skip: parseInt(req.query.skip, 10),
-		// 		sort: sort
-		// 	}
-		// }])
 		await req.user.populate([populateOptions])
 		res.send(req.user.tasks)
 	} 
@@ -78,10 +60,10 @@ router.get('/tasks/:id', auth, async (req, res) => {
 
 	try {
 		const task = await Task.findOne({ _id, owner: req.user._id })
-		if (!task) { res.status(404).send({ error: 'Task not found' }) }
+		if (!task) { return res.status(404).send({ error: 'Task not found' }) }
 		res.send(task)
 	} 
-	catch (error) { res.status.toString(500).send(error) }
+	catch (error) { res.status(500).send(error) }
 })
 
 router.patch('/tasks/:id', auth, async (req, res) => {
